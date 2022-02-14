@@ -65,7 +65,7 @@ function onResults(results) {
     drawLandmarks(outputCanvasCtx, results.poseLandmarks, { color: "#FF0000", radius: 1});
     outputCanvasCtx.restore()
     inputCanvasCtx.drawImage(results.image,0,0,inputCanvas.width,inputCanvas.height);
-    drawConnectors(inputCanvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: "#00FF00", lineWidth: 2});
+    drawConnectors(inputCanvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: "#00FF00", lineWidth: 5});
 
     if(isRecording){
         recordedPoseData.push({
@@ -131,7 +131,7 @@ function saveData(){
     saveBtn.innerText="Saving..";
     saveBtn.style.backgroundColor="green";
     let data = { 
-        name: "Tree Pose",
+        poseName: "Tree Pose",
         duration:10,
         data:recordedPoseData,
     };

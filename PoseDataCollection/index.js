@@ -20,9 +20,11 @@ app.get('/', function(req, res) {
   res.render('');
 });
 
+
+
 app.post('/addPoseData',async (req,res)=>{
   const poseData=new Pose({
-    name:req.body.name,
+    poseName:req.body.poseName,
     duration:req.body.duration,
     data:req.body.data,
   });
@@ -38,5 +40,23 @@ app.post('/addPoseData',async (req,res)=>{
     })
     }
 });
-  
-app.listen(process.env.PORT || 8000);
+
+
+app.get("/recordings",async(req,res)=>{
+  let poses= await Pose.find().select({"poseName":1,"duration":1})
+   res.render("recordings",{poses:poses});
+});
+
+
+app.get("/getPoseData/:id",async (req,res)=>{
+  const id=req.params.id;
+  let data=await Pose.findById(id);
+  res.json(data);
+})
+
+app.get("/deleteRecording/:id",async(req,res)=>{
+  const id=req.params.id;
+  await Pose.deleteOne({_id:id});
+  res.json({msg:"deleted"});
+})
+app.listen(process.env.PORT || 8080);

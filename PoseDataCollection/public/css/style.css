@@ -209,3 +209,75 @@ body,html{
     transform: scale(1.0);
     transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
 }
+
+
+
+.recording-container{
+    display: flex;
+    flex-direction: column;
+    width:100vw;
+    height: 100vh;
+    background-color: #F5F5F5;
+    margin: auto;
+    justify-content:flex-start;
+    align-items: center;
+}
+
+.header{
+    margin: 40px;
+}
+.header h1{
+    font-size: 48px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #494646;
+    
+}
+
+.recordings{
+    display: flex;
+    width: 70%;
+    flex-direction: column;
+}
+.record{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    margin: 10px;
+    padding: 10px;
+}
+
+.record h1{
+    color: #D0D0D0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+}
+
+.loader {
+    display: fixed;
+    border: 5px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 5px solid #494646;
+    width: 30px;
+    height: 30px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+  }
+  
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+
+  .hidden{
+      display: none;
+  }

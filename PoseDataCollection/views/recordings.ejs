@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="/css/style.css" />
+		<title>Recordings</title>
+	</head>
+	<body>
+		
+		<div class="recording-container">
+			<div class="header">
+				<h1>Recordings</h1>
+			</div>
+			<%poses.forEach((pose)=>{%>
+			<div class="recordings">
+				<div class="record">
+					<h1><%=pose.poseName%></h1>
+					<h1><%=pose.duration%> seconds</h1>
+					<div class="button green" id=<%=pose._id%> onclick="replay()">Replay</div>
+					<div class="button red" id=<%=pose._id%> onclick="del()">Delete</div>
+				</div>
+			</div>
+			<%})%>
+		</div>
+		<div class="modal">
+			<div class="modal-content">
+				<span class="close-button" onclick="toggleModal()">&times;</span>
+				<div class="loader hidden"></div>
+				<div class="output">
+					<canvas class="output_canvas" width="800px" height="600px"></canvas>
+				</div>
+			</div>
+		</div>
+	</body>
+
+	<script>
+		const modal = document.getElementsByClassName("modal")[0];
+        const outputCanvas= document.getElementsByClassName("output_canvas")[0];
+        const outputCanvasCtx = outputCanvas.getContext("2d");
+		const loader=document.getElementsByClassName("loader")[0];
+		let replaying=false;
+		async function replay() {
+			if(replaying){
+				return;
+			}
+			toggleModal();
+			replaying=true;
+			loader.classList.toggle("hidden");
+			let res= await fetch(`/getPoseData/${event.srcElement.id}`, {
+				method: "GET",
+				headers: {
+					"Content-type": "application/json; charset=UTF-8",
+				},
+			});
+            const {data,duration,poseName}=await res.json();
+			loader.classList.toggle("hidden");
+			let frames=data.length;
+			let frameIdx=0;
+			let timePerFrame= Math.floor(duration*1000/frames);
+			let animTimer=setInterval(()=>{
+				if(frameIdx==frames-1 || !replaying){
+					outputCanvasCtx.clearRect(0,0,outputCanvas.width,outputCanvas.height);
+					clearInterval(animTimer);
+				}else{
+					drawFrame(data[frameIdx]);
+					frameIdx+=1;
+				}
+			},timePerFrame)
+		}
+
+        function drawFrame(frame){
+			outputCanvasCtx.save();
+    		outputCanvasCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+			drawConnectors(outputCanvasCtx, frame.poseLandmarks, POSE_CONNECTIONS, { color: "#00FF00", lineWidth: 4});
+			drawLandmarks(outputCanvasCtx, frame.poseLandmarks, { color: "#FF0000", radius: 2});
+			outputCanvasCtx.restore()
+        }
+
+		function toggleModal() {
+			replaying=false;
+			modal.classList.toggle("show-modal");
+		}
+
+		async function del(){
+			let res= await fetch(`/deleteRecording/${event.srcElement.id}`, {
+				method: "GET",
+				headers: {
+					"Content-type": "application/json; charset=UTF-8",
+				},
+			});
+			window.location.reload();
+		}
+	</script>
+</html>
