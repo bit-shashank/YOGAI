@@ -130,14 +130,15 @@ function saveData(){
     saving=true;
     saveBtn.innerText="Saving..";
     saveBtn.style.backgroundColor="green";
+    let poseID=document.getElementById("poseID").innerText;
     let data = { 
-        poseName: "Tree Pose",
+        poseId: poseID,
         duration:10,
         data:recordedPoseData,
     };
 
     async function save(){
-        let res= await fetch("/addPoseData", {
+        let res= await fetch("/addRecording", {
             method: "POST",
             headers: {'Content-Type': 'application/json'}, 
             body: JSON.stringify(data)

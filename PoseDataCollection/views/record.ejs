@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="/css/style.css">
+	</head>
+
+	<body>
+		<div class="modal">
+			<div class="modal-content">
+				<span class="close-button" onclick="toggleModal()">&times;</span>
+				<h1>Pose Recorded</h1>
+				<div class="button green" id="saveBtn" onClick="saveData()">Save Pose</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="cover">
+				<h1>Take Your Pose,Recording In </h1>
+				<h2><span id="prepTime">10</span></h2>
+			</div>
+            <div class="left">
+				
+				<video class="input_video"></video>
+				<canvas class="input_canvas" width="1600px" height="1200px"></canvas>
+			
+               <div class="img_container">
+                    <img src=<%=pose.img%>>
+					<h1><%=pose.name%></h1>
+                </div> 
+            </div>
+            <p class="hidden" id="poseID"><%=pose._id%></p>
+			<div class="right">
+                <div class="output">
+                    <canvas class="output_canvas" width="400px" height="300px"></canvas>
+                </div>
+				<div class="recordingStats">
+					<h1>Hold for <span id="recordTime">10</span> seconds</h2>
+				</div>
+				<div class="controls">
+					<div class="button black" id="startBtn" onclick="start()">Start Recording</div>
+				</div>
+            </div>
+		</div>
+	</body>
+	<script src="/js/main.js" defer></script>
+</html>

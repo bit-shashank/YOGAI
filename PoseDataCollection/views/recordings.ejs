@@ -17,13 +17,14 @@
 			<div class="header">
 				<h1>Recordings</h1>
 			</div>
-			<%poses.forEach((pose)=>{%>
+			<%recordings.forEach((recording,idx)=>{%>
 			<div class="recordings">
 				<div class="record">
-					<h1><%=pose.poseName%></h1>
-					<h1><%=pose.duration%> seconds</h1>
-					<div class="button green" id=<%=pose._id%> onclick="replay()">Replay</div>
-					<div class="button red" id=<%=pose._id%> onclick="del()">Delete</div>
+					<h1><%=idx+1%></h1>
+					<h1><%=recording.pose.name%></h1>
+					<h1><%=recording.duration%> seconds</h1>
+					<div class="button green" id=<%=recording._id%> onclick="replay()">Replay</div>
+					<div class="button red" id=<%=recording._id%> onclick="del()">Delete</div>
 				</div>
 			</div>
 			<%})%>
@@ -45,6 +46,8 @@
         const outputCanvasCtx = outputCanvas.getContext("2d");
 		const loader=document.getElementsByClassName("loader")[0];
 		let replaying=false;
+		let recordings={};
+
 		async function replay() {
 			if(replaying){
 				return;
@@ -52,13 +55,28 @@
 			toggleModal();
 			replaying=true;
 			loader.classList.toggle("hidden");
-			let res= await fetch(`/getPoseData/${event.srcElement.id}`, {
-				method: "GET",
-				headers: {
-					"Content-type": "application/json; charset=UTF-8",
-				},
-			});
-            const {data,duration,poseName}=await res.json();
+
+			let recordingId=event.srcElement.id;
+			let data,duration,poseName;
+
+			if (recordingId in recordings){
+				data=recordings[recordingId].data;
+				duration=recordings[recordingId].duration;
+				poseName=recordings[recordingId].pose.name;
+			}
+			else{
+				let res= await fetch(`/getRecording/${event.srcElement.id}`, {
+					method: "GET",
+					headers: {
+						"Content-type": "application/json; charset=UTF-8",
+					},
+				});
+            	const d=await res.json();
+				data=d.data;
+				duration=d.duration;
+				poseName=d.pose.name;
+				recordings[recordingId]=d;
+			}
 			loader.classList.toggle("hidden");
 			let frames=data.length;
 			let frameIdx=0;

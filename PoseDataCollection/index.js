@@ -1,9 +1,10 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const mongoose = require('mongoose');
-const Pose=require('./models/PoseData');
+const mongoose = require("mongoose");
+const Recording = require("./models/Recording");
+const Pose = require("./models/Pose");
 
-let connURL="mongodb+srv://loneCoder:QWERTY1234@cluster0-avdpm.mongodb.net/poseDataDB?retryWrites=true&w=majority";
+let connURL = "mongodb+srv://loneCoder:QWERTY1234@cluster0-avdpm.mongodb.net/poseDataDB?retryWrites=true&w=majority";
 mongoose.connect(connURL);
 
 const con = mongoose.connection;
@@ -11,52 +12,55 @@ con.on("open", () => {
 	console.log("Connected To Database");
 });
 
-app.use(express.static('public'));
-app.use(express.urlencoded({extended: true}))
-app.use(express.json({ limit: '5mb' }));
-app.set('view engine', 'ejs');
+app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "5mb" }));
+app.set("view engine", "ejs");
 
-app.get('/', function(req, res) {
-  res.render('');
+app.get("/", async (req, res) => {
+	let poses = await Pose.find({});
+	res.render("", { poses: poses });
 });
 
-
-
-app.post('/addPoseData',async (req,res)=>{
-  const poseData=new Pose({
-    poseName:req.body.poseName,
-    duration:req.body.duration,
-    data:req.body.data,
-  });
-  try{
-    await poseData.save();
-    res.status(200).json({
-      msg:"Saved Successfully",
-    });
-  }
-  catch(err){
-    res.status(503).json({
-      msg:"Unable to save error occured"
-    })
-    }
+app.get("/record/:poseId", async (req, res) => {
+	const poseId=req.params.poseId;
+	const pose=await Pose.findById(poseId);
+	res.render("record",{pose});
 });
 
-
-app.get("/recordings",async(req,res)=>{
-  let poses= await Pose.find().select({"poseName":1,"duration":1})
-   res.render("recordings",{poses:poses});
+app.post("/addRecording", async (req, res) => {
+	const recording = new Recording({
+		pose: req.body.poseId,
+		duration: req.body.duration,
+		data: req.body.data,
+	});
+	try {
+		await recording.save();
+		res.status(200).json({
+			msg: "Saved Successfully",
+		});
+	} catch (err) {
+		res.status(503).json({
+			msg: "Unable to save error occured",
+		});
+	}
 });
 
+app.get("/recordings", async (req, res) => {
+	let recordings = await Recording.find().select({ pose: 1, duration: 1 }).sort({ _id: -1 }).populate("pose");
+	res.render("recordings", { recordings });
+});
 
-app.get("/getPoseData/:id",async (req,res)=>{
-  const id=req.params.id;
-  let data=await Pose.findById(id);
-  res.json(data);
-})
+app.get("/getRecording/:id", async (req, res) => {
+	const id = req.params.id;
+	let data = await Recording.findById(id).populate("pose");
+	res.json(data);
+});
 
-app.get("/deleteRecording/:id",async(req,res)=>{
-  const id=req.params.id;
-  await Pose.deleteOne({_id:id});
-  res.json({msg:"deleted"});
-})
+app.get("/deleteRecording/:id", async (req, res) => {
+	const id = req.params.id;
+	await Recording.deleteOne({ _id: id });
+	res.json({ msg: "deleted" });
+});
+
 app.listen(process.env.PORT || 8080);
