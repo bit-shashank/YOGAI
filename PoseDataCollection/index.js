@@ -57,10 +57,16 @@ app.get("/getRecording/:id", async (req, res) => {
 	res.json(data);
 });
 
+
 app.get("/deleteRecording/:id", async (req, res) => {
 	const id = req.params.id;
 	await Recording.deleteOne({ _id: id });
 	res.json({ msg: "deleted" });
 });
 
+app.get("/playground/:poseId", async(req,res)=>{
+	const poseId=req.params.poseId;
+	const pose=await Pose.findById(poseId);
+	res.render("playground",{pose});
+});
 app.listen(process.env.PORT || 8080);
